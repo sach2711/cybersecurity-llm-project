@@ -1,6 +1,6 @@
 # LLM-Integrated ML Framework for Automated Cyber Threat Detection, Response and Incident Report Generation
 
-Final year project, Sathyabama Institute of Science and Technology (CSE)
+Final year project, Sathyabama Institute of Science and Technology (B.Tech - I.T)
 
 **Team:** Sachin S (43120295) and Niresh Kumar S (43120282)
 **Guide:** Ms. P. Gopika, M.E., (Ph.D)
