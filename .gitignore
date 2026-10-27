@@ -1,0 +1,5 @@
+data/cicids2017_cleaned.csv
+models/*.pkl
+__pycache__/
+*.pyc
+reports/*.txt

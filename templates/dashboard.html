@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberSecurity Dashboard</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    background:#0a0e1a;
+    color:#e2e8f0;
+    font-family:'Segoe UI',sans-serif;
+}
+
+.header {
+    background:#0d1526;
+    padding:18px 30px;
+    border-bottom:2px solid #00d4ff;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.header h1{
+    color:#00d4ff;
+    font-size:20px;
+}
+
+.status{
+    color:#10b981;
+    font-size:13px;
+}
+
+.container{
+    padding:24px 30px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:24px;
+}
+
+.stat-card{
+    background:#0d1526;
+    border-radius:10px;
+    padding:20px;
+    text-align:center;
+    border:1px solid #1e2d42;
+}
+
+.stat-num{
+    font-size:36px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.stat-label{
+    font-size:12px;
+    color:#64748b;
+}
+
+.cyan{color:#00d4ff;}
+.red{color:#ef4444;}
+.green{color:#10b981;}
+.amber{color:#f59e0b;}
+
+.section-title{
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:14px;
+    color:#94a3b8;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+}
+
+.btn{
+    background:#00d4ff;
+    color:#000;
+    border:none;
+    padding:12px 28px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    margin-bottom:24px;
+}
+
+.btn:hover{
+    background:#00b8d9;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#0d1526;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:24px;
+}
+
+th{
+    background:#0a1220;
+    padding:12px 16px;
+    text-align:left;
+    font-size:11px;
+    color:#64748b;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
+td{
+    padding:12px 16px;
+    font-size:13px;
+    border-bottom:1px solid #0f1e2e;
+}
+
+tr:last-child td{
+    border-bottom:none;
+}
+
+.badge{
+    padding:3px 10px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.badge-critical{
+    background:rgba(239,68,68,.15);
+    color:#ef4444;
+}
+
+.badge-high{
+    background:rgba(245,158,11,.15);
+    color:#f59e0b;
+}
+
+.badge-medium{
+    background:rgba(139,92,246,.15);
+    color:#8b5cf6;
+}
+
+.badge-none{
+    background:rgba(100,116,139,.15);
+    color:#64748b;
+}
+
+.badge-blocked{
+    background:rgba(16,185,129,.15);
+    color:#10b981;
+}
+
+.badge-open{
+    background:rgba(239,68,68,.15);
+    color:#ef4444;
+}
+
+.report-box{
+    background:#0d1526;
+    border:1px solid #1e2d42;
+    border-radius:10px;
+    padding:20px;
+    font-family:monospace;
+    font-size:12px;
+    color:#94a3b8;
+    white-space:pre-wrap;
+    max-height:280px;
+    overflow-y:auto;
+    margin-bottom:24px;
+}
+
+.loading{
+    text-align:center;
+    color:#64748b;
+    padding:40px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🛡️ SecureAI — Cybersecurity Dashboard</h1>
+    <div class="status">🟢 SYSTEM ONLINE | AI Model Active</div>
+</div>
+
+<div class="container">
+
+<div class="stats">
+
+<div class="stat-card">
+<div class="stat-num cyan" id="total">0</div>
+<div class="stat-label">Total Analyzed</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-num red" id="attacks">0</div>
+<div class="stat-label">Attacks Detected</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-num green" id="blocked">0</div>
+<div class="stat-label">IPs Blocked</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-num amber" id="normal">0</div>
+<div class="stat-label">Normal Traffic</div>
+</div>
+
+</div>
+
+<button class="btn" onclick="simulate()">
+⚡ Run Attack Simulation
+</button>
+
+<button
+class="btn"
+style="background:#ef4444;margin-left:10px;"
+onclick="reset()">
+🔄 Reset
+</button>
+
+<div class="section-title">
+Recent Threat Detections
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Report ID</th>
+<th>Time</th>
+<th>Source IP</th>
+<th>Attack Type</th>
+<th>Confidence</th>
+<th>Severity</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="detections-body">
+<tr>
+<td colspan="7" class="loading">
+Click "Run Attack Simulation" to start
+</td>
+</tr>
+</tbody>
+
+</table>
+
+<div class="section-title">
+Latest Auto-Generated Incident Report
+</div>
+
+<div class="report-box" id="latest-report">
+Report will appear here after simulation...
+</div>
+
+</div>
+
+<script>
+
+let detections = [];
+
+function getBadge(severity){
+
+const map={
+'CRITICAL':'badge-critical',
+'HIGH':'badge-high',
+'MEDIUM':'badge-medium',
+'NONE':'badge-none'
+};
+
+return `<span class="badge ${map[severity]||'badge-none'}">${severity}</span>`;
+}
+
+function simulate(){
+
+document.getElementById('detections-body').innerHTML=
+'<tr><td colspan="7" class="loading">🔄 Running simulation...</td></tr>';
+
+fetch('/api/simulate')
+.then(r=>r.json())
+.then(data=>{
+
+updateTable(data);
+updateStats();
+
+if(data.length>0){
+
+const attack=data.find(d=>d.attack!=='Normal Traffic');
+
+if(attack){
+document.getElementById('latest-report').textContent=attack.report;
+}
+
+}
+
+});
+
+}
+
+function updateTable(data){
+
+const tbody=document.getElementById('detections-body');
+
+tbody.innerHTML='';
+
+data.forEach(d=>{
+
+const status=d.blocked
+?'<span class="badge badge-blocked">🔒 BLOCKED</span>'
+:'<span class="badge badge-open">🔍 FLAGGED</span>';
+
+tbody.innerHTML+=`
+<tr>
+<td>${d.id}</td>
+<td>${d.time}</td>
+<td>${d.ip}</td>
+<td><b>${d.attack}</b></td>
+<td>${d.confidence}%</td>
+<td>${getBadge(d.severity)}</td>
+<td>${status}</td>
+</tr>`;
+
+});
+
+}
+
+function updateStats(){
+
+fetch('/api/stats')
+.then(r=>r.json())
+.then(s=>{
+
+document.getElementById('total').textContent=s.total;
+document.getElementById('attacks').textContent=s.attacks;
+document.getElementById('blocked').textContent=s.blocked;
+document.getElementById('normal').textContent=s.normal;
+
+});
+
+}
+
+function reset(){
+
+detections=[];
+
+document.getElementById('detections-body').innerHTML=
+'<tr><td colspan="7" class="loading">Cleared. Click Simulate to start fresh.</td></tr>';
+
+document.getElementById('total').textContent='0';
+document.getElementById('attacks').textContent='0';
+document.getElementById('blocked').textContent='0';
+document.getElementById('normal').textContent='0';
+
+document.getElementById('latest-report').textContent=
+'Report will appear here after simulation...';
+
+}
+
+</script>
+
+</body>
+</html>
